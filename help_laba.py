@@ -1,29 +1,23 @@
-from math import sqrt
-
 import numpy as np
+from scipy.optimize import curve_fit
 
 
 def LSM(x, y):
-    x_y = np.mean(x * y)
-    x_ = np.mean(x)
-    y_ = np.mean(y)
+    function = lambda x, a, b: a*x  + b
+    popt, pcov = curve_fit(function, xdata=x, ydata=y)
 
-    x_2 = np.mean(x ** 2)
-    y_2 = np.mean(y ** 2)
+    sigma_a = np.sqrt(pcov[0,0])
+    sigma_b = np.sqrt(pcov[1, 1])
 
-    b = (x_y - (x_ * y_))/\
-        (x_2 - (x_ ** 2))
-    sigma_b = 1/sqrt(len(x)) * sqrt((y_2 - (y_ ** 2))/
-                               (x_2 - (x_ ** 2)) - b ** 2)
-    epsilon = sigma_b / b
-
-    a = y_ - b * x_
-
-    return b, a, sigma_b, epsilon
+    return popt[0], popt[1], sigma_a, sigma_b
 
 
-def mean_square_error(data):
-    data_mean = np.mean(data)
-    delta = data - data_mean
-    sigma = sqrt(len(data) / (len(data) - 1) * sum(delta ** 2))
-    return data_mean, sigma
+def chi_sq(x, y, err):
+    function = lambda x, a, b: a * x + b
+    popt, pcov = curve_fit(function, xdata=x, ydata=y, sigma=err)
+
+    sigma_a = np.sqrt(pcov[0, 0])
+    sigma_b = np.sqrt(pcov[1, 1])
+
+    return popt[0], popt[1], sigma_a, sigma_b
+
