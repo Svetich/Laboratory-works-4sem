@@ -3,7 +3,7 @@ from scipy.optimize import curve_fit
 
 
 def LSM(x, y):
-    function = lambda x, a, b: a*x  + b
+    function = lambda x, a, b: a*x + b
     popt, pcov = curve_fit(function, xdata=x, ydata=y)
 
     sigma_a = np.sqrt(pcov[0,0])
